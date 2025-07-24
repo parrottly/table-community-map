@@ -1,0 +1,24 @@
+{
+  "name": "table-community-map",
+  "version": "1.0.0",
+  "description": "Interactive map of The Table Church community and affinity groups throughout the DMV area",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required for static site'",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "keywords": [
+    "community",
+    "church",
+    "groups",
+    "mapping",
+    "dmv",
+    "planning-center"
+  ],
+  "author": "The Table Church",
+  "license": "MIT"
+}

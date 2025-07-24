@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Groups Map - The Table Church</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Raleway:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS for mapping -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="table-text-black-transparent.png" alt="The Table Church" class="logo">
+                </div>
+                <nav class="header-nav">
+                    <a href="#map-section" class="nav-link">Find Groups</a>
+                    <a href="#gap-analysis" class="nav-link">Growth Areas</a>
+                    <a href="https://thetablechurch.churchcenter.com/" class="cta-link" target="_blank">Join a Group</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Find Your Community</h1>
+                <p>Discover Community & Affinity Groups meeting throughout the DMV area</p>
+            </div>
+        </section>
+
+        <section id="map-section" class="map-section">
+            <div class="container">
+                <div class="map-header">
+                    <h2>Community Groups Map</h2>
+                    <div class="map-controls">
+                        <div class="filter-group">
+                            <label for="group-type-filter">Group Type:</label>
+                            <select id="group-type-filter">
+                                <option value="all">All Groups</option>
+                                <option value="community">Community Groups</option>
+                                <option value="affinity">Affinity Groups</option>
+                            </select>
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-circle community"></div>
+                                <span>Community Groups</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-circle affinity"></div>
+                                <span>Affinity Groups</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="map" class="map-container">
+                    <div class="map-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading community groups...</p>
+                    </div>
+                </div>
+
+                <div class="groups-sidebar">
+                    <h3>Groups in Your Area</h3>
+                    <div id="groups-list" class="groups-list">
+                        <div class="loading">Loading groups...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gap-analysis" class="gap-analysis">
+            <div class="container">
+                <h2>Growth Opportunities</h2>
+                <p>Areas where new Community Groups could serve our growing community</p>
+                
+                <div class="gap-grid">
+                    <div class="gap-card">
+                        <h3>Northern Virginia</h3>
+                        <div class="gap-status high-need">High Need</div>
+                        <p>Growing young professional population in Arlington, Alexandria, and Fairfax areas</p>
+                        <div class="gap-stats">
+                            <span>Population: 250K+</span>
+                            <span>Current Groups: 2</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gap-card">
+                        <h3>Montgomery County, MD</h3>
+                        <div class="gap-status medium-need">Medium Need</div>
+                        <p>Diverse communities in Rockville, Bethesda, and Silver Spring</p>
+                        <div class="gap-stats">
+                            <span>Population: 180K+</span>
+                            <span>Current Groups: 3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gap-card">
+                        <h3>Southeast DC</h3>
+                        <div class="gap-status high-need">High Need</div>
+                        <p>Underserved communities with growing interest in progressive faith</p>
+                        <div class="gap-stats">
+                            <span>Population: 120K+</span>
+                            <span>Current Groups: 1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gap-cta">
+                    <h3>Interested in Starting a Group?</h3>
+                    <p>We provide training, resources, and ongoing support for new group leaders</p>
+                    <a href="https://thetablechurch.churchcenter.com/" class="cta-button" target="_blank">
+                        Learn About Leadership
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 The Table Church. Building authentic community throughout the DMV.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="planning-center-api.js"></script>
+    <script src="map.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
