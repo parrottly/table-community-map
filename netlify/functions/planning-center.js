@@ -32,8 +32,15 @@ exports.handler = async (event, context) => {
         const CLIENT_ID = process.env.PLANNING_CENTER_CLIENT_ID;
         const SECRET = process.env.PLANNING_CENTER_SECRET;
         
+        // Debug logging
+        console.log('Environment check:');
+        console.log('CLIENT_ID exists:', !!CLIENT_ID);
+        console.log('SECRET exists:', !!SECRET);
+        console.log('CLIENT_ID length:', CLIENT_ID ? CLIENT_ID.length : 0);
+        console.log('SECRET length:', SECRET ? SECRET.length : 0);
+        
         if (!CLIENT_ID || !SECRET) {
-            throw new Error('Missing Planning Center API credentials');
+            throw new Error(`Missing Planning Center API credentials. CLIENT_ID: ${!!CLIENT_ID}, SECRET: ${!!SECRET}`);
         }
 
         // Extract endpoint from path
