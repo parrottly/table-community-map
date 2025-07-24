@@ -28,19 +28,19 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        // Get Planning Center credentials from environment variables
-        const CLIENT_ID = process.env.PLANNING_CENTER_CLIENT_ID;
-        const SECRET = process.env.PLANNING_CENTER_SECRET;
+        // Get Planning Center Personal Access Token from environment variables
+        const PAT_APP_ID = process.env.PLANNING_CENTER_APP_ID;
+        const PAT_SECRET = process.env.PLANNING_CENTER_SECRET;
         
         // Debug logging
         console.log('Environment check:');
-        console.log('CLIENT_ID exists:', !!CLIENT_ID);
-        console.log('SECRET exists:', !!SECRET);
-        console.log('CLIENT_ID length:', CLIENT_ID ? CLIENT_ID.length : 0);
-        console.log('SECRET length:', SECRET ? SECRET.length : 0);
+        console.log('PAT_APP_ID exists:', !!PAT_APP_ID);
+        console.log('PAT_SECRET exists:', !!PAT_SECRET);
+        console.log('PAT_APP_ID length:', PAT_APP_ID ? PAT_APP_ID.length : 0);
+        console.log('PAT_SECRET length:', PAT_SECRET ? PAT_SECRET.length : 0);
         
-        if (!CLIENT_ID || !SECRET) {
-            throw new Error(`Missing Planning Center API credentials. CLIENT_ID: ${!!CLIENT_ID}, SECRET: ${!!SECRET}`);
+        if (!PAT_APP_ID || !PAT_SECRET) {
+            throw new Error(`Missing Planning Center PAT credentials. APP_ID: ${!!PAT_APP_ID}, SECRET: ${!!PAT_SECRET}`);
         }
 
         // Extract endpoint from path
@@ -49,7 +49,7 @@ exports.handler = async (event, context) => {
         let data;
         
         if (path === '/groups' || path === '/groups/') {
-            data = await fetchGroups(CLIENT_ID, SECRET);
+            data = await fetchGroups(PAT_APP_ID, PAT_SECRET);
         } else {
             throw new Error(`Unknown endpoint: ${path}`);
         }
@@ -77,11 +77,11 @@ exports.handler = async (event, context) => {
     }
 };
 
-// Fetch groups from Planning Center Groups API
-async function fetchGroups(clientId, secret) {
+// Fetch groups from Planning Center Groups API using Personal Access Token
+async function fetchGroups(appId, secret) {
     try {
-        // Create Basic Auth header
-        const credentials = Buffer.from(`${clientId}:${secret}`).toString('base64');
+        // Create Basic Auth header for Personal Access Token
+        const credentials = Buffer.from(`${appId}:${secret}`).toString('base64');
         
         // Planning Center Groups API endpoint
         const apiUrl = 'https://api.planningcenteronline.com/groups/v2/groups';
