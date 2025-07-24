@@ -109,18 +109,30 @@ async function fetchGroups(appId, secret) {
         
         console.log(`✅ Fetched ${groups.length} groups from Planning Center`);
         
+        // Debug: Log raw group data structure
+        if (groups.length > 0) {
+            console.log('First group structure:', JSON.stringify(groups[0], null, 2));
+        } else {
+            console.log('No groups found in API response');
+            console.log('Full API response:', JSON.stringify(responseData, null, 2));
+        }
+        
         // Filter and process groups
         const processedGroups = groups
             .filter(group => {
                 // Only include active, published groups
                 const attributes = group.attributes || {};
-                return !attributes.archived && 
-                       attributes.public_church_center_web_url && 
-                       attributes.enrollment === 'open';
+                const isActive = !attributes.archived;
+                const hasUrl = !!attributes.public_church_center_web_url;
+                const isOpen = attributes.enrollment === 'open' || attributes.enrollment === 'request_to_join';
+                
+                console.log(`Group "${attributes.name}": active=${isActive}, hasUrl=${hasUrl}, enrollment=${attributes.enrollment}`);
+                
+                return isActive; // Simplified filter for debugging
             })
             .map(group => processGroupData(group));
 
-        console.log(`✅ Processed ${processedGroups.length} active groups`);
+        console.log(`✅ Processed ${processedGroups.length} active groups from ${groups.length} total groups`);
         
         return processedGroups;
         
