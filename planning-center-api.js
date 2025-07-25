@@ -9,10 +9,6 @@ class PlanningCenterAPI {
 
     // Fetch all groups from Planning Center
     async getGroups() {
-        // TEMPORARY: Force use of fallback data to test distribution
-        console.log('🔧 TEMPORARILY USING FALLBACK DATA FOR TESTING');
-        return this.getFallbackGroups();
-        
         try {
             console.log('Fetching groups from Planning Center...');
             
@@ -341,7 +337,8 @@ class PlanningCenterAPI {
             const point = distributionPoints[distributionIndex % distributionPoints.length];
             distributionIndex++;
             
-            console.log(`Assigning "${group.name}" to ${point.name}`);
+            const distributedCoords = this.addRandomOffset(point.coords);
+            console.log(`Assigning "${group.name}" to ${point.name} at [${distributedCoords.join(', ')}]`);
             
             return {
                 ...group,
@@ -349,10 +346,9 @@ class PlanningCenterAPI {
                     ...group.location,
                     address: `${point.name} area`,
                     neighborhood: point.name,
-                    coordinates: this.addRandomOffset(point.coords),
                     hasSpecificLocation: true // Mark as having location for map display
                 },
-                coordinates: this.addRandomOffset(point.coords)
+                coordinates: distributedCoords // Direct property for map.js
             };
         });
     }
