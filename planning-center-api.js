@@ -94,20 +94,44 @@ class PlanningCenterAPI {
             selected_location: locationString
         });
         
-        // If we have a meaningful location, geocode it
+        console.log(`Final location decision for "${attributes.name}": locationString = "${locationString}"`);
+        
+        // Be VERY strict about what constitutes a specific location
+        // Only allow groups with clear neighborhood/city names
         if (locationString && 
             locationString.trim() !== '' && 
             locationString.toLowerCase() !== 'dmv area' &&
             locationString.toLowerCase() !== 'contact for location' &&
-            !locationString.toLowerCase().includes('varies')) {
+            locationString.toLowerCase() !== 'varies' &&
+            locationString.toLowerCase() !== 'tbd' &&
+            locationString.toLowerCase() !== 'to be determined' &&
+            !locationString.toLowerCase().includes('contact') &&
+            !locationString.toLowerCase().includes('varies') &&
+            !locationString.toLowerCase().includes('multiple') &&
+            !locationString.toLowerCase().includes('different') &&
+            locationString.length > 3) { // Must be more than just "DC" or "VA"
             
             const coordinates = this.geocodeLocation(locationString);
-            return {
-                address: locationString,
-                neighborhood: this.extractNeighborhood(locationString),
-                coordinates: coordinates,
-                hasSpecificLocation: true
-            };
+            
+            // Additional check: only allow if geocoding found a real match (not default DC)
+            const dcCenter = [38.9072, -77.0369];
+            const distance = Math.sqrt(
+                Math.pow(coordinates[0] - dcCenter[0], 2) + 
+                Math.pow(coordinates[1] - dcCenter[1], 2)
+            );
+            
+            // If coordinates are too close to DC center, it's probably a default assignment
+            if (distance > 0.01) { // More than ~0.5 miles from DC center
+                console.log(`APPROVED specific location for "${attributes.name}": ${locationString} -> [${coordinates.join(', ')}]`);
+                return {
+                    address: locationString,
+                    neighborhood: this.extractNeighborhood(locationString),
+                    coordinates: coordinates,
+                    hasSpecificLocation: true
+                };
+            } else {
+                console.log(`REJECTED - too close to DC center (likely default): "${attributes.name}": ${locationString} -> [${coordinates.join(', ')}]`);
+            }
         }
         
         // No specific location available - these groups should not appear on map
@@ -278,8 +302,8 @@ class PlanningCenterAPI {
             return this.addRandomOffset([38.9907, -77.0261]);
         }
         
-        // Default to DC center with random offset
-        console.log(`No match found for "${location}", using DC center with offset`);
+        // Default to DC center with random offset - but this will be caught by distance check
+        console.log(`No match found for "${location}", defaulting to DC center (may be rejected)`);
         return this.addRandomOffset([38.9072, -77.0369]);
     }
     
