@@ -112,6 +112,30 @@ async function fetchGroups(appId, secret) {
         // Debug: Log raw group data structure
         if (groups.length > 0) {
             console.log('First group structure:', JSON.stringify(groups[0], null, 2));
+            
+            // Log all group names and available location data
+            console.log('\n=== ALL GROUPS ANALYSIS ===');
+            groups.forEach((group, index) => {
+                const attrs = group.attributes || {};
+                console.log(`Group ${index + 1}: "${attrs.name}"`);
+                console.log('  Location fields:', {
+                    location_type_preference: attrs.location_type_preference,
+                    location: attrs.location,
+                    address: attrs.address,
+                    meeting_location: attrs.meeting_location,
+                    contact_info: attrs.contact_info,
+                    schedule: attrs.schedule
+                });
+                console.log('  All location-related keys:', Object.keys(attrs).filter(key => 
+                    key.toLowerCase().includes('location') || 
+                    key.toLowerCase().includes('address') ||
+                    key.toLowerCase().includes('contact') ||
+                    key.toLowerCase().includes('meeting') ||
+                    key.toLowerCase().includes('place') ||
+                    key.toLowerCase().includes('venue')
+                ));
+            });
+            console.log('=== END GROUPS ANALYSIS ===\n');
         } else {
             console.log('No groups found in API response');
             console.log('Full API response:', JSON.stringify(responseData, null, 2));
