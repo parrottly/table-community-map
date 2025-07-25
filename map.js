@@ -289,7 +289,7 @@ class CommunityMap {
                 <div class="group-name">${group.name}</div>
                 <span class="group-type ${typeClass}">${typeLabel}</span>
                 <div class="group-details">
-                    <div class="group-location">📍 DMV Area - Contact for location</div>
+                    <div class="group-location">📍 Varies - Contact for location</div>
                     <div>📅 ${group.meetingDay}</div>
                     ${group.memberCount ? `<div>👥 ${group.memberCount} members</div>` : ''}
                 </div>

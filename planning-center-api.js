@@ -26,10 +26,7 @@ class PlanningCenterAPI {
             }
             
             console.log('✅ Groups loaded from Planning Center:', data.groups.length);
-            const processedGroups = this.processGroups(data.groups);
-            
-            // Apply geographic distribution to groups without specific locations
-            return this.distributeGroupsGeographically(processedGroups);
+            return this.processGroups(data.groups);
             
         } catch (error) {
             console.error('❌ Failed to fetch groups:', error);
@@ -113,10 +110,10 @@ class PlanningCenterAPI {
             };
         }
         
-        // No specific location available
-        console.log(`No specific location for group "${attributes.name}"`);
+        // No specific location available - these groups should not appear on map
+        console.log(`No specific location for group "${attributes.name}" - will appear in Additional Groups section`);
         return {
-            address: 'Contact for meeting location',
+            address: 'Varies - Contact for location',
             neighborhood: 'DMV Area',
             coordinates: null,
             hasSpecificLocation: false
@@ -308,56 +305,6 @@ class PlanningCenterAPI {
         return parts[0]?.trim() || 'DMV Area';
     }
 
-    // Distribute groups across DMV when no specific location data is available
-    distributeGroupsGeographically(groups) {
-        console.log('Applying geographic distribution to groups without specific locations');
-        
-        // Predefined distribution points across DMV
-        const distributionPoints = [
-            { name: 'Dupont Circle', coords: [38.9097, -77.0365] },
-            { name: 'Arlington', coords: [38.8816, -77.0910] },
-            { name: 'Columbia Heights', coords: [38.9289, -77.0353] },
-            { name: 'Bethesda', coords: [38.9807, -77.1010] },
-            { name: 'Alexandria', coords: [38.8048, -77.0469] },
-            { name: 'Silver Spring', coords: [38.9907, -77.0261] },
-            { name: 'Capitol Hill', coords: [38.8903, -76.9901] },
-            { name: 'Fairfax', coords: [38.8462, -77.3064] },
-            { name: 'Georgetown', coords: [38.9076, -77.0723] },
-            { name: 'Adams Morgan', coords: [38.9220, -77.0420] },
-            { name: 'Rockville', coords: [39.0840, -77.1528] },
-            { name: 'Takoma Park', coords: [38.9779, -77.0074] }
-        ];
-        
-        let distributionIndex = 0;
-        
-        return groups.map(group => {
-            console.log(`BEFORE distribution - Group "${group.name}": coordinates = ${group.coordinates ? group.coordinates.join(', ') : 'null'}, hasSpecificLocation = ${group.location?.hasSpecificLocation}`);
-            
-            // If group already has coordinates AND a specific location, keep them
-            if (group.coordinates && group.location?.hasSpecificLocation) {
-                console.log(`Keeping existing location for "${group.name}" at [${group.coordinates.join(', ')}]`);
-                return group;
-            }
-            
-            // Otherwise, assign to next distribution point
-            const point = distributionPoints[distributionIndex % distributionPoints.length];
-            distributionIndex++;
-            
-            const distributedCoords = this.addRandomOffset(point.coords);
-            console.log(`Assigning "${group.name}" to ${point.name} at [${distributedCoords.join(', ')}]`);
-            
-            return {
-                ...group,
-                location: {
-                    ...group.location,
-                    address: `${point.name} area`,
-                    neighborhood: point.name,
-                    hasSpecificLocation: true // Mark as having location for map display
-                },
-                coordinates: distributedCoords // Direct property for map.js
-            };
-        });
-    }
 
     // Fallback data if API fails
     getFallbackGroups() {
