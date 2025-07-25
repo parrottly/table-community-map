@@ -35,6 +35,10 @@ class PlanningCenterAPI {
             console.error('❌ Failed to fetch groups:', error);
             return this.getFallbackGroups();
         }
+        
+        // TEMPORARY: Force use of fallback data to test distribution
+        console.log('🔧 TEMPORARILY USING FALLBACK DATA FOR TESTING');
+        return this.getFallbackGroups();
     }
 
     // Process raw Planning Center data into our format

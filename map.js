@@ -123,6 +123,17 @@ class CommunityMap {
         this.markerClusterGroup.clearLayers();
         this.markers = [];
         
+        // Debug: Log all group coordinates
+        console.log('\n=== GROUP COORDINATES ANALYSIS ===');
+        this.groups.forEach((group, index) => {
+            console.log(`Group ${index + 1}: "${group.name}"`);
+            console.log(`  Coordinates: ${group.coordinates ? group.coordinates.join(', ') : 'null'}`);
+            console.log(`  Location: ${group.location?.address || 'no address'}`);
+            console.log(`  Neighborhood: ${group.location?.neighborhood || 'no neighborhood'}`);
+            console.log(`  Has specific location: ${group.location?.hasSpecificLocation}`);
+        });
+        console.log('=== END COORDINATES ANALYSIS ===\n');
+        
         // Separate groups with and without locations
         const groupsWithLocations = this.groups.filter(group => group.coordinates && group.location.hasSpecificLocation);
         const groupsWithoutLocations = this.groups.filter(group => !group.coordinates || !group.location.hasSpecificLocation);
@@ -131,6 +142,7 @@ class CommunityMap {
         
         // Add markers for groups with locations
         groupsWithLocations.forEach(group => {
+            console.log(`Adding marker for "${group.name}" at [${group.coordinates.join(', ')}]`);
             const marker = this.createGroupMarker(group);
             this.markers.push({ marker, group });
             this.markerClusterGroup.addLayer(marker);
