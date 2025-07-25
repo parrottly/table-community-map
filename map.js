@@ -117,24 +117,35 @@ class CommunityMap {
         }
     }
 
-    // Add groups to map as markers
+    // Add groups to map as markers (only those with coordinates)
     addGroupsToMap() {
         // Clear existing markers
         this.markerClusterGroup.clearLayers();
         this.markers = [];
         
-        this.groups.forEach(group => {
-            if (!group.coordinates) return;
-            
+        // Separate groups with and without locations
+        const groupsWithLocations = this.groups.filter(group => group.coordinates && group.location.hasSpecificLocation);
+        const groupsWithoutLocations = this.groups.filter(group => !group.coordinates || !group.location.hasSpecificLocation);
+        
+        console.log(`Map: ${groupsWithLocations.length} groups with locations, ${groupsWithoutLocations.length} without`);
+        
+        // Add markers for groups with locations
+        groupsWithLocations.forEach(group => {
             const marker = this.createGroupMarker(group);
             this.markers.push({ marker, group });
             this.markerClusterGroup.addLayer(marker);
         });
         
-        // Fit map to show all groups
+        // Update the no-location groups section
+        this.updateNoLocationGroups(groupsWithoutLocations);
+        
+        // Fit map to show all groups with locations
         if (this.markers.length > 0) {
             const group = new L.featureGroup(this.markers.map(m => m.marker));
             this.map.fitBounds(group.getBounds().pad(0.1));
+        } else {
+            // If no groups have locations, center on DMV
+            this.map.setView(this.dmvCenter, 10);
         }
     }
 
@@ -200,18 +211,23 @@ class CommunityMap {
         `;
     }
 
-    // Update the groups list in sidebar
+    // Update the groups list in sidebar (only groups with locations)
     updateGroupsList() {
         const listContainer = document.getElementById('groups-list');
         if (!listContainer) return;
         
-        if (this.groups.length === 0) {
-            listContainer.innerHTML = '<div class="loading">No groups found</div>';
+        const groupsWithLocations = this.groups.filter(group => 
+            group.coordinates && 
+            group.location.hasSpecificLocation &&
+            (this.currentFilter === 'all' || group.groupType === this.currentFilter)
+        );
+        
+        if (groupsWithLocations.length === 0) {
+            listContainer.innerHTML = '<div class="loading">No groups with specific locations found</div>';
             return;
         }
         
-        const groupsHtml = this.groups
-            .filter(group => this.currentFilter === 'all' || group.groupType === this.currentFilter)
+        const groupsHtml = groupsWithLocations
             .map(group => this.createGroupListItem(group))
             .join('');
         
@@ -224,6 +240,50 @@ class CommunityMap {
                 this.selectGroup(groupId);
             });
         });
+    }
+    
+    // Update the no-location groups section
+    updateNoLocationGroups(groupsWithoutLocations) {
+        const sectionContainer = document.getElementById('no-location-groups');
+        const listContainer = document.getElementById('no-location-list');
+        
+        if (!sectionContainer || !listContainer) return;
+        
+        const filteredGroups = groupsWithoutLocations.filter(group => 
+            this.currentFilter === 'all' || group.groupType === this.currentFilter
+        );
+        
+        if (filteredGroups.length === 0) {
+            sectionContainer.style.display = 'none';
+            return;
+        }
+        
+        sectionContainer.style.display = 'block';
+        
+        const groupsHtml = filteredGroups
+            .map(group => this.createNoLocationGroupItem(group))
+            .join('');
+        
+        listContainer.innerHTML = groupsHtml;
+    }
+    
+    // Create list item for groups without specific locations
+    createNoLocationGroupItem(group) {
+        const typeClass = group.groupType === 'community' ? 'community' : 'affinity';
+        const typeLabel = group.groupType === 'community' ? 'Community Group' : 'Affinity Group';
+        
+        return `
+            <div class="group-card no-location-card">
+                <div class="group-name">${group.name}</div>
+                <span class="group-type ${typeClass}">${typeLabel}</span>
+                <div class="group-details">
+                    <div class="group-location">📍 DMV Area - Contact for location</div>
+                    <div>📅 ${group.meetingDay}</div>
+                    ${group.memberCount ? `<div>👥 ${group.memberCount} members</div>` : ''}
+                </div>
+                <div class="contact-note">Contact church for meeting details</div>
+            </div>
+        `;
     }
 
     // Create list item for a group

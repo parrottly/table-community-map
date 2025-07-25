@@ -56,25 +56,56 @@ class PlanningCenterAPI {
                 isActive: attributes.archived === false,
                 lastUpdated: attributes.updated_at
             };
-        }).filter(group => group.isActive && group.coordinates);
+        }).filter(group => group.isActive); // Don't filter out groups without coordinates yet
     }
 
     // Extract location information and geocode if needed
     extractLocation(attributes) {
-        const locationString = attributes.location_type_preference || 
-                              attributes.location || 
-                              attributes.contact_info ||
-                              'DMV Area';
+        // Check all possible location fields from Planning Center
+        const locationOptions = [
+            attributes.location_type_preference,
+            attributes.location,
+            attributes.contact_info,
+            attributes.church_center_url_location,
+            attributes.address,
+            attributes.meeting_location
+        ].filter(Boolean);
         
-        console.log(`Processing group location: "${locationString}"`);
+        let locationString = locationOptions[0] || '';
         
-        // Try to extract coordinates or neighborhood info
-        const coordinates = this.geocodeLocation(locationString);
+        console.log(`Processing group "${attributes.name}":`, {
+            available_fields: Object.keys(attributes).filter(key => 
+                key.toLowerCase().includes('location') || 
+                key.toLowerCase().includes('address') ||
+                key.toLowerCase().includes('contact')
+            ),
+            location_options: locationOptions,
+            selected_location: locationString
+        });
         
+        // If we have a meaningful location, geocode it
+        if (locationString && 
+            locationString.trim() !== '' && 
+            locationString.toLowerCase() !== 'dmv area' &&
+            locationString.toLowerCase() !== 'contact for location' &&
+            !locationString.toLowerCase().includes('varies')) {
+            
+            const coordinates = this.geocodeLocation(locationString);
+            return {
+                address: locationString,
+                neighborhood: this.extractNeighborhood(locationString),
+                coordinates: coordinates,
+                hasSpecificLocation: true
+            };
+        }
+        
+        // No specific location available
+        console.log(`No specific location for group "${attributes.name}"`);
         return {
-            address: locationString,
-            neighborhood: this.extractNeighborhood(locationString),
-            coordinates: coordinates
+            address: 'Contact for meeting location',
+            neighborhood: 'DMV Area',
+            coordinates: null,
+            hasSpecificLocation: false
         };
     }
 
@@ -197,13 +228,14 @@ class PlanningCenterAPI {
         return this.addRandomOffset([38.9072, -77.0369]);
     }
     
-    // Add small random offset to prevent exact clustering
+    // Add small random offset within 0.25 miles for privacy
     addRandomOffset(coords) {
         const [lat, lng] = coords;
         
-        // Add random offset within ~1-2 miles
-        const latOffset = (Math.random() - 0.5) * 0.02; // ~0.01 degrees ≈ 1 mile
-        const lngOffset = (Math.random() - 0.5) * 0.02;
+        // Add random offset within ~0.25 miles (fuzzy location for privacy)
+        // 0.0036 degrees ≈ 0.25 miles
+        const latOffset = (Math.random() - 0.5) * 0.0072; 
+        const lngOffset = (Math.random() - 0.5) * 0.0072;
         
         return [
             lat + latOffset,

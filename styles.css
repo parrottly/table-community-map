@@ -278,6 +278,45 @@ header {
     font-weight: 500;
 }
 
+/* No Location Groups Section */
+.no-location-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #D1D5DB;
+}
+
+.no-location-section h3 {
+    font-family: 'Raleway', sans-serif;
+    color: #6B7280;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-description {
+    color: #6B7280;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.no-location-card {
+    border-left: 3px solid #D1D5DB !important;
+    background: #F9FAFB !important;
+}
+
+.no-location-card:hover {
+    border-color: #9CA3AF !important;
+    cursor: default;
+}
+
+.contact-note {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #9CA3AF;
+    font-style: italic;
+}
+
 /* Gap Analysis Section */
 .gap-analysis {
     background: #F9FAFB;
