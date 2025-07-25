@@ -370,8 +370,9 @@ class PlanningCenterAPI {
                 location: {
                     address: 'Dupont Circle, DC',
                     neighborhood: 'Dupont Circle',
-                    coordinates: [38.9097, -77.0365]
+                    hasSpecificLocation: true
                 },
+                coordinates: [38.9097, -77.0365], // Direct property, not nested
                 meetingDay: 'Wednesday evenings',
                 contactInfo: 'Contact church for details',
                 memberCount: 12,
@@ -385,8 +386,9 @@ class PlanningCenterAPI {
                 location: {
                     address: 'Arlington, VA',
                     neighborhood: 'Arlington',
-                    coordinates: [38.8816, -77.0910]
+                    hasSpecificLocation: true
                 },
+                coordinates: [38.8816, -77.0910], // Direct property, not nested
                 meetingDay: 'Tuesday evenings',
                 contactInfo: 'Contact church for details',
                 memberCount: 8,
@@ -400,8 +402,9 @@ class PlanningCenterAPI {
                 location: {
                     address: 'Columbia Heights, DC',
                     neighborhood: 'Columbia Heights',
-                    coordinates: [38.9289, -77.0353]
+                    hasSpecificLocation: true
                 },
+                coordinates: [38.9289, -77.0353], // Direct property, not nested
                 meetingDay: 'Thursday evenings',
                 contactInfo: 'Contact church for details',
                 memberCount: 15,
@@ -415,8 +418,9 @@ class PlanningCenterAPI {
                 location: {
                     address: 'Shaw, DC',
                     neighborhood: 'Shaw',
-                    coordinates: [38.9129, -77.0218]
+                    hasSpecificLocation: true
                 },
+                coordinates: [38.9129, -77.0218], // Direct property, not nested
                 meetingDay: 'Monthly gatherings',
                 contactInfo: 'Contact church for details',
                 memberCount: 6,
@@ -430,8 +434,9 @@ class PlanningCenterAPI {
                 location: {
                     address: 'Bethesda, MD',
                     neighborhood: 'Bethesda',
-                    coordinates: [38.9807, -77.1010]
+                    hasSpecificLocation: true
                 },
+                coordinates: [38.9807, -77.1010], // Direct property, not nested
                 meetingDay: 'Sunday afternoons',
                 contactInfo: 'Contact church for details',
                 memberCount: 10,
