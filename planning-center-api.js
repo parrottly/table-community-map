@@ -328,10 +328,13 @@ class PlanningCenterAPI {
         let distributionIndex = 0;
         
         return groups.map(group => {
-            // If group already has coordinates, keep them
-            if (group.coordinates) {
-                return group;
-            }
+            // TEMPORARY: Force all groups through distribution (ignore existing coordinates)
+            console.log(`BEFORE distribution - Group "${group.name}": coordinates = ${group.coordinates ? group.coordinates.join(', ') : 'null'}`);
+            
+            // Skip existing coordinates check to force distribution
+            // if (group.coordinates) {
+            //     return group;
+            // }
             
             // Otherwise, assign to next distribution point
             const point = distributionPoints[distributionIndex % distributionPoints.length];
