@@ -154,7 +154,10 @@ class PlanningCenterAPI {
         ];
         
         // Check if any location keywords appear in the group name
-        for (const location of locationKeywords) {
+        // Sort by length descending to match longer phrases first (e.g., "dupont circle" before "dupont")
+        const sortedKeywords = locationKeywords.sort((a, b) => b.length - a.length);
+        
+        for (const location of sortedKeywords) {
             if (name.includes(location)) {
                 console.log(`Found location "${location}" in group name: "${groupName}"`);
                 return location;
@@ -328,13 +331,13 @@ class PlanningCenterAPI {
         let distributionIndex = 0;
         
         return groups.map(group => {
-            // TEMPORARY: Force all groups through distribution (ignore existing coordinates)
-            console.log(`BEFORE distribution - Group "${group.name}": coordinates = ${group.coordinates ? group.coordinates.join(', ') : 'null'}`);
+            console.log(`BEFORE distribution - Group "${group.name}": coordinates = ${group.coordinates ? group.coordinates.join(', ') : 'null'}, hasSpecificLocation = ${group.location?.hasSpecificLocation}`);
             
-            // Skip existing coordinates check to force distribution
-            // if (group.coordinates) {
-            //     return group;
-            // }
+            // If group already has coordinates AND a specific location, keep them
+            if (group.coordinates && group.location?.hasSpecificLocation) {
+                console.log(`Keeping existing location for "${group.name}" at [${group.coordinates.join(', ')}]`);
+                return group;
+            }
             
             // Otherwise, assign to next distribution point
             const point = distributionPoints[distributionIndex % distributionPoints.length];
