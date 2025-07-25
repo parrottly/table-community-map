@@ -63,10 +63,12 @@ class PlanningCenterAPI {
     extractLocation(attributes) {
         const locationString = attributes.location_type_preference || 
                               attributes.location || 
+                              attributes.contact_info ||
                               'DMV Area';
         
+        console.log(`Processing group location: "${locationString}"`);
+        
         // Try to extract coordinates or neighborhood info
-        // This might need enhancement based on actual Planning Center data structure
         const coordinates = this.geocodeLocation(locationString);
         
         return {
@@ -97,14 +99,12 @@ class PlanningCenterAPI {
         return isAffinity ? 'affinity' : 'community';
     }
 
-    // Basic geocoding for DMV area locations
+    // Enhanced geocoding for DMV area locations with distribution
     geocodeLocation(locationString) {
-        // This is a simplified geocoder - in production you might want to use
-        // a proper geocoding service or maintain a database of known locations
-        
         const dmvLocations = {
-            // DC Neighborhoods
+            // Washington DC - Central
             'dupont circle': [38.9097, -77.0365],
+            'dupont': [38.9097, -77.0365],
             'adams morgan': [38.9220, -77.0420],
             'capitol hill': [38.8903, -76.9901],
             'columbia heights': [38.9289, -77.0353],
@@ -112,6 +112,19 @@ class PlanningCenterAPI {
             'petworth': [38.9369, -77.0249],
             'brookland': [38.9339, -76.9956],
             'anacostia': [38.8622, -76.9810],
+            'foggy bottom': [38.9006, -77.0472],
+            'georgetown': [38.9076, -77.0723],
+            'logan circle': [38.9095, -77.0292],
+            'u street': [38.9169, -77.0281],
+            'h street': [38.8998, -76.9951],
+            'navy yard': [38.8762, -77.0065],
+            'downtown': [38.8951, -77.0364],
+            'chinatown': [38.8998, -77.0218],
+            
+            // DC Broader terms
+            'washington dc': [38.9072, -77.0369],
+            'washington': [38.9072, -77.0369],
+            'dc': [38.9072, -77.0369],
             
             // Northern Virginia
             'arlington': [38.8816, -77.0910],
@@ -120,27 +133,82 @@ class PlanningCenterAPI {
             'vienna': [38.9012, -77.2653],
             'reston': [38.9687, -77.3411],
             'sterling': [39.0068, -77.4286],
+            'annandale': [38.8304, -77.1963],
+            'falls church': [38.8823, -77.1711],
+            'tysons': [38.9188, -77.2297],
+            'leesburg': [39.1156, -77.5636],
+            'herndon': [38.9696, -77.3861],
+            'mclean': [38.9338, -77.1775],
+            'springfield': [38.7893, -77.1872],
+            'burke': [38.7932, -77.2719],
+            'woodbridge': [38.6581, -77.2497],
+            'manassas': [38.7509, -77.4753],
             
-            // Maryland
+            // Maryland Suburbs
             'bethesda': [38.9807, -77.1010],
             'rockville': [39.0840, -77.1528],
             'silver spring': [38.9907, -77.0261],
             'takoma park': [38.9779, -77.0074],
             'college park': [38.9897, -76.9378],
-            'hyattsville': [38.9551, -76.9455]
+            'hyattsville': [38.9551, -76.9455],
+            'gaithersburg': [39.1434, -77.2014],
+            'germantown': [39.1712, -77.2717],
+            'wheaton': [39.0370, -77.0558],
+            'kensington': [39.0273, -77.0764],
+            'chevy chase': [38.9851, -77.0872],
+            'potomac': [39.0223, -77.2086],
+            'bowie': [38.9426, -76.7302],
+            'laurel': [39.0993, -76.8483],
+            'greenbelt': [38.9912, -76.8756],
+            'riverdale': [38.9584, -76.9119]
         };
         
-        const location = locationString.toLowerCase();
+        const location = locationString.toLowerCase().trim();
+        console.log(`Geocoding location: "${location}"`);
         
-        // Try to find a match in our known locations
+        // Try exact matches first
+        if (dmvLocations[location]) {
+            const coords = dmvLocations[location];
+            console.log(`Exact match found: ${coords}`);
+            return this.addRandomOffset(coords);
+        }
+        
+        // Try partial matches
         for (const [place, coords] of Object.entries(dmvLocations)) {
-            if (location.includes(place)) {
-                return coords;
+            if (location.includes(place) || place.includes(location)) {
+                console.log(`Partial match "${place}" found: ${coords}`);
+                return this.addRandomOffset(coords);
             }
         }
         
-        // Default to DC center if no match found
-        return [38.9072, -77.0369];
+        // Check for state/region indicators
+        if (location.includes('virginia') || location.includes('va')) {
+            console.log('Virginia location detected, using Arlington');
+            return this.addRandomOffset([38.8816, -77.0910]);
+        }
+        
+        if (location.includes('maryland') || location.includes('md')) {
+            console.log('Maryland location detected, using Silver Spring');
+            return this.addRandomOffset([38.9907, -77.0261]);
+        }
+        
+        // Default to DC center with random offset
+        console.log(`No match found for "${location}", using DC center with offset`);
+        return this.addRandomOffset([38.9072, -77.0369]);
+    }
+    
+    // Add small random offset to prevent exact clustering
+    addRandomOffset(coords) {
+        const [lat, lng] = coords;
+        
+        // Add random offset within ~1-2 miles
+        const latOffset = (Math.random() - 0.5) * 0.02; // ~0.01 degrees ≈ 1 mile
+        const lngOffset = (Math.random() - 0.5) * 0.02;
+        
+        return [
+            lat + latOffset,
+            lng + lngOffset
+        ];
     }
 
     // Extract neighborhood from location string

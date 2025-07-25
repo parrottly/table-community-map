@@ -60,10 +60,11 @@ class CommunityMap {
             maxZoom: 18
         }).addTo(this.map);
 
-        // Initialize marker cluster group
+        // Initialize marker cluster group with reduced clustering
         this.markerClusterGroup = L.markerClusterGroup({
             chunkedLoading: true,
-            maxClusterRadius: 50,
+            maxClusterRadius: 25, // Reduced from 50 to spread groups more
+            disableClusteringAtZoom: 12, // Stop clustering when zoomed in
             iconCreateFunction: (cluster) => {
                 const count = cluster.getChildCount();
                 let className = 'marker-cluster-small';
