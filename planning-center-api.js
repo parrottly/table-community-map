@@ -73,6 +73,16 @@ class PlanningCenterAPI {
         
         let locationString = locationOptions[0] || '';
         
+        // Try to infer location from group name if no explicit location found
+        if (!locationString || 
+            locationString.trim() === '' || 
+            locationString.toLowerCase() === 'dmv area' ||
+            locationString.toLowerCase() === 'contact for location' ||
+            locationString.toLowerCase().includes('varies')) {
+            
+            locationString = this.extractLocationFromName(attributes.name) || locationString;
+        }
+        
         console.log(`Processing group "${attributes.name}":`, {
             available_fields: Object.keys(attributes).filter(key => 
                 key.toLowerCase().includes('location') || 
@@ -80,6 +90,7 @@ class PlanningCenterAPI {
                 key.toLowerCase().includes('contact')
             ),
             location_options: locationOptions,
+            inferred_from_name: this.extractLocationFromName(attributes.name),
             selected_location: locationString
         });
         
@@ -107,6 +118,47 @@ class PlanningCenterAPI {
             coordinates: null,
             hasSpecificLocation: false
         };
+    }
+
+    // Extract location from group name (many groups include location in their title)
+    extractLocationFromName(groupName) {
+        if (!groupName) return null;
+        
+        const name = groupName.toLowerCase();
+        
+        // List of DMV locations that might appear in group names
+        const locationKeywords = [
+            // DC neighborhoods
+            'dupont circle', 'dupont', 'adams morgan', 'capitol hill', 'columbia heights',
+            'shaw', 'petworth', 'brookland', 'anacostia', 'foggy bottom', 'georgetown',
+            'logan circle', 'u street', 'h street', 'navy yard', 'downtown', 'chinatown',
+            
+            // DC general
+            'washington dc', 'washington', 'dc',
+            
+            // Northern Virginia
+            'arlington', 'alexandria', 'fairfax', 'vienna', 'reston', 'sterling',
+            'annandale', 'falls church', 'tysons', 'leesburg', 'herndon', 'mclean',
+            'springfield', 'burke', 'woodbridge', 'manassas',
+            
+            // Maryland suburbs
+            'bethesda', 'rockville', 'silver spring', 'takoma park', 'college park',
+            'hyattsville', 'gaithersburg', 'germantown', 'wheaton', 'kensington',
+            'chevy chase', 'potomac', 'bowie', 'laurel', 'greenbelt', 'riverdale',
+            
+            // Broader regional terms
+            'northern virginia', 'nova', 'maryland', 'virginia'
+        ];
+        
+        // Check if any location keywords appear in the group name
+        for (const location of locationKeywords) {
+            if (name.includes(location)) {
+                console.log(`Found location "${location}" in group name: "${groupName}"`);
+                return location;
+            }
+        }
+        
+        return null;
     }
 
     // Determine if it's a Community Group or Affinity Group
